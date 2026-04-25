@@ -18,6 +18,17 @@
   }
 }
 
+input {
+  color: black !important;
+  background-color: white !important;
+  caret-color: black !important;
+}
+
+input::placeholder {
+  color: gray !important;
+  opacity: 1;
+}
+
 .hero {
   position: relative;
 

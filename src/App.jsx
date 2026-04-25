@@ -1,36 +1,52 @@
+
 import './App.css';
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from './pages/Home';
-import SignUp from './pages/Signup';
-import Login from './pages/Login';
-import AddProduct from './pages/AddProduct';
-import ProductList from './pages/ProductList';
-import User from './dashbords/User';
-import Admin from './dashbords/Admin';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
-
+import Home from './pages/Home';
+import SignUp from './pages/SignUp';
+import Login from './pages/Login';
+import AddProduct from './pages/AddProduct';
+import ProductDetail from './pages/ProductDetail';
+import UserDashboard from './dashboards/UserDashboard';
+import AdminDashboard from './dashboards/AdminDashboard';
 
 function App() {
   return (
-    <BrowserRouter>
-
-      <Header />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/add-product" element={<AddProduct />} />
-        <Route path="/product/:id" element={<ProductList />} />
-        <Route path="/dashboard" element={<User />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-
-      <Footer />
-
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/home" element={<Home />} />
+              <Route path="/" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/dashboard" element={
+                <PrivateRoute>
+                  <UserDashboard />
+                </PrivateRoute>
+              } />
+              <Route path="/add-product" element={
+                <PrivateRoute>
+                  <AddProduct />
+                </PrivateRoute>
+              } />
+              <Route path="/admin" element={
+                <PrivateRoute adminOnly>
+                  <AdminDashboard />
+                </PrivateRoute>
+              } />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

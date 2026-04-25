@@ -1,70 +1,221 @@
-import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 
 function SignUp() {
-  const nav = useNavigate();
-  const [show, setShow] = useState(false);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
+  const navigate = useNavigate();
+  const { signup } = useAuth();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] = useState("");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'name') {
+      const nameRegex = /^[A-Za-z\s]*$/;
+      if (nameRegex.test(value) || value === '') {
+        setFormData({ ...formData, [name]: value });
+      }
+    }
+    else if (name === 'phone') {
+      const phoneRegex = /^\d*$/;
+      if (phoneRegex.test(value) && value.length <= 10) {
+        setFormData({ ...formData, [name]: value });
+      }
+    }
+    else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
-  const submit = () => {
-    if (!form.name || !form.email || !form.password)
-      return setError("Fill all fields");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    
+    if (!formData.name || !formData.email || !formData.password) {
+      setError("❌ Please fill all required fields");
+      return;
+    }
 
-    if (!form.email.includes("@"))
-      return setError("Invalid email");
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      setError("❌ Name must contain only letters and spaces");
+      return;
+    }
 
-    if (form.password.length < 6)
-      return setError("Password must be 6+ chars");
+    if (formData.password.length < 6) {
+      setError("❌ Password must be at least 6 characters");
+      return;
+    }
 
-    localStorage.setItem("user", JSON.stringify(form));
-    nav("/login");
+    if (formData.phone && formData.phone.length !== 10) {
+      setError("❌ Phone number must be exactly 10 digits");
+      return;
+    }
+
+    setLoading(true);
+
+    const result = await signup(
+      formData.name,
+      formData.email,
+      formData.password,
+      formData.phone
+    );
+
+    if (result.success) {
+      setSuccess("✅ Account created successfully!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } else {
+      setError(`❌ ${result.message || "Signup failed"}`);
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-pink-50 p-4">
-
-      <div className="bg-white p-5 w-full max-w-md rounded-xl">
-
-        <h2 className="text-[#c2185b] text-xl font-bold mb-4">Sign Up</h2>
-
-        {error && <p className="text-red-500">{error}</p>}
-
-        <input
-          placeholder="Name"
-          className="w-full border p-2 mb-2"
-          onChange={e => setForm({ ...form, name: e.target.value })}
-        />
-
-        <input
-          placeholder="Email"
-          className="w-full border p-2 mb-2"
-          onChange={e => setForm({ ...form, email: e.target.value })}
-        />
-
-        <div className="flex border p-2 items-center mb-3">
-          <input
-            type={show ? "text" : "password"}
-            placeholder="Password"
-            className="w-full outline-none"
-            onChange={e => setForm({ ...form, password: e.target.value })}
-          />
-          <span onClick={() => setShow(!show)}>
-            {show ? <EyeOff /> : <Eye />}
-          </span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100 py-12 px-4">
+      <div className="bg-white shadow-xl max-w-md w-full p-8">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-[#c2185b]">Create Account</h2>
+          <p className="text-gray-600 mt-2">Join ArasBaby today</p>
         </div>
 
-        <button onClick={submit} className="w-full bg-[#c2185b] text-white py-2">
-          Create Account
-        </button>
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-4">
+            {error}
+          </div>
+        )}
 
+        {success && (
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 mb-4">
+            {success}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
+                style={{ 
+                  borderRadius: 0,
+                  color: '#000000',
+                  backgroundColor: '#ffffff',
+                  WebkitTextFillColor: '#000000'
+                }}
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
+                style={{ 
+                  borderRadius: 0,
+                  color: '#000000',
+                  backgroundColor: '#ffffff',
+                  WebkitTextFillColor: '#000000'
+                }}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
+                style={{ 
+                  borderRadius: 0,
+                  color: '#000000',
+                  backgroundColor: '#ffffff',
+                  WebkitTextFillColor: '#000000'
+                }}
+                placeholder="Enter 10 digit phone number"
+                maxLength="10"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Optional - Must be exactly 10 digits</p>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Password </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
+                style={{ 
+                  borderRadius: 0,
+                  color: '#000000',
+                  backgroundColor: '#ffffff',
+                  WebkitTextFillColor: '#000000'
+                }}
+                placeholder="Create a password (min. 6 characters)"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#c2185b] text-white py-3 font-semibold hover:bg-pink-700 transition disabled:opacity-50"
+            style={{ borderRadius: 0 }}
+          >
+            {loading ? 'Creating Account...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-[#c2185b] font-semibold hover:underline">
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -31,7 +31,61 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root {@import "tailwindcss";
+
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #ffffff;
+  --border: #e5e4e7;
+  --accent: #c2185b;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fdf2f8; /* full pink background */
+  color: #111827;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* optional smooth image */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* remove old vite styles */
+h1,
+h2,
+p,
+code,
+.counter,
+.hero,
+#center,
+#next-steps,
+#docs,
+#spacer,
+.ticks {
+  all: unset;
+}
     --text: #9ca3af;
     --text-h: #f3f4f6;
     --bg: #16171d;
@@ -52,20 +106,20 @@
 
 body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  font-family: Arial, sans-serif;
+
+  background: #fdf2f8;
+
+  color: white;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
 }
-
 h1,
 h2 {
   font-family: var(--heading);
