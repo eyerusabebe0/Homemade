@@ -1,3 +1,4 @@
+// src/components/SignUp.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -19,22 +20,7 @@ function SignUp() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    if (name === 'name') {
-      const nameRegex = /^[A-Za-z\s]*$/;
-      if (nameRegex.test(value) || value === '') {
-        setFormData({ ...formData, [name]: value });
-      }
-    }
-    else if (name === 'phone') {
-      const phoneRegex = /^\d*$/;
-      if (phoneRegex.test(value) && value.length <= 10) {
-        setFormData({ ...formData, [name]: value });
-      }
-    }
-    else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -47,19 +33,8 @@ function SignUp() {
       return;
     }
 
-    const nameRegex = /^[A-Za-z\s]+$/;
-    if (!nameRegex.test(formData.name)) {
-      setError("❌ Name must contain only letters and spaces");
-      return;
-    }
-
     if (formData.password.length < 6) {
       setError("❌ Password must be at least 6 characters");
-      return;
-    }
-
-    if (formData.phone && formData.phone.length !== 10) {
-      setError("❌ Phone number must be exactly 10 digits");
       return;
     }
 
@@ -73,9 +48,9 @@ function SignUp() {
     );
 
     if (result.success) {
-      setSuccess("✅ Account created successfully!");
+      setSuccess("✅ Account created successfully! ");
       setTimeout(() => {
-        navigate("/login");
+        navigate("/home");
       }, 1500);
     } else {
       setError(`❌ ${result.message || "Signup failed"}`);
@@ -85,20 +60,20 @@ function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100 py-12 px-4">
-      <div className="bg-white shadow-xl max-w-md w-full p-8">
+      <div className="bg-white shadow-xl max-w-md w-full p-8 rounded-2xl">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-[#c2185b]">Create Account</h2>
           <p className="text-gray-600 mt-2">Join ArasBaby today</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-4">
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-4 rounded">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 mb-4">
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 mb-4 rounded">
             {success}
           </div>
         )}
@@ -113,13 +88,7 @@ function SignUp() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ 
-                  borderRadius: 0,
-                  color: '#000000',
-                  backgroundColor: '#ffffff',
-                  WebkitTextFillColor: '#000000'
-                }}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
                 placeholder="Enter your full name"
                 required
               />
@@ -135,13 +104,7 @@ function SignUp() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ 
-                  borderRadius: 0,
-                  color: '#000000',
-                  backgroundColor: '#ffffff',
-                  WebkitTextFillColor: '#000000'
-                }}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
                 placeholder="Enter your email"
                 required
               />
@@ -157,22 +120,14 @@ function SignUp() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ 
-                  borderRadius: 0,
-                  color: '#000000',
-                  backgroundColor: '#ffffff',
-                  WebkitTextFillColor: '#000000'
-                }}
-                placeholder="Enter 10 digit phone number"
-                maxLength="10"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
+                placeholder="Enter phone number"
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">Optional - Must be exactly 10 digits</p>
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password </label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Password *</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -180,13 +135,7 @@ function SignUp() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ 
-                  borderRadius: 0,
-                  color: '#000000',
-                  backgroundColor: '#ffffff',
-                  WebkitTextFillColor: '#000000'
-                }}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
                 placeholder="Create a password (min. 6 characters)"
                 required
               />
@@ -203,8 +152,7 @@ function SignUp() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#c2185b] text-white py-3 font-semibold hover:bg-pink-700 transition disabled:opacity-50"
-            style={{ borderRadius: 0 }}
+            className="w-full bg-[#c2185b] text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition disabled:opacity-50"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>

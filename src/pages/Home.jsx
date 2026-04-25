@@ -1,6 +1,7 @@
+// src/components/Home.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from "../services/api";
+import api from '../services/api';
 import { ShoppingBag, Heart, Star } from 'lucide-react';
 
 function Home() {
@@ -111,7 +112,13 @@ function Home() {
                       <span className="text-sm text-gray-600">4.5</span>
                     </div>
                   </div>
-                  <button className="mt-3 w-full bg-[#c2185b] text-white py-2 rounded-lg hover:bg-pink-700 transition flex items-center justify-center gap-2">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/product/${product._id}`);
+                    }}
+                    className="mt-3 w-full bg-[#c2185b] text-white py-2 rounded-lg hover:bg-pink-700 transition flex items-center justify-center gap-2"
+                  >
                     <ShoppingBag size={18} />
                     View Details
                   </button>

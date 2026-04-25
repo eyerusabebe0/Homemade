@@ -10,11 +10,11 @@ function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const links = user ? [
-    { to: '/', icon: Home, label: 'Home' },
+    { to: '/home', icon: Home, label: 'Home' },
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/add-product', icon: PlusSquare, label: 'Post' }
   ] : [];

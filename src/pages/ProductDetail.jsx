@@ -1,3 +1,4 @@
+// src/components/ProductDetail.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -12,6 +13,7 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
 
   useEffect(() => {
     fetchProduct();
@@ -37,12 +39,25 @@ function ProductDetail() {
 
     setPurchasing(true);
     try {
-      const total = product.price * quantity;
-      await api.post(`/products/${id}/purchase`, { quantity, total });
-      alert('Purchase successful! Check your dashboard.');
-      navigate('/dashboard');
+      const subtotal = product.price * quantity;
+      const vat = subtotal * 0.03;
+      const totalWithVAT = subtotal + vat;
+      
+      await api.post(`/products/${id}/purchase`, { 
+        quantity, 
+        subtotal,
+        vat,
+        total: totalWithVAT 
+      });
+      
+      setMessage({ text: `✅ Purchase successful! Total with 3% VAT: ${totalWithVAT.toFixed(2)} ETB`, type: 'success' });
+      
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
     } catch (error) {
-      alert(error.response?.data?.message || 'Purchase failed');
+      setMessage({ text: `❌ ${error.response?.data?.message || 'Purchase failed'}`, type: 'error' });
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000);
     } finally {
       setPurchasing(false);
     }
@@ -58,7 +73,9 @@ function ProductDetail() {
 
   if (!product) return null;
 
-  const total = product.price * quantity;
+  const subtotal = product.price * quantity;
+  const vat = subtotal * 0.03;
+  const totalWithVAT = subtotal + vat;
 
   return (
     <div className="min-h-screen bg-pink-50 py-12 px-4">
@@ -70,6 +87,12 @@ function ProductDetail() {
           <ArrowLeft size={20} />
           Back to Products
         </button>
+
+        {message.text && (
+          <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-700 border-l-4 border-green-500' : 'bg-red-100 text-red-700 border-l-4 border-red-500'}`}>
+            {message.text}
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8">
@@ -141,9 +164,19 @@ function ProductDetail() {
               </div>
 
               <div className="mb-6 p-3 bg-pink-50 rounded-lg">
-                <div className="flex justify-between text-gray-700">
-                  <span>Total:</span>
-                  <span className="font-bold text-xl text-[#c2185b]">{total} ETB</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-gray-700">
+                    <span>Subtotal:</span>
+                    <span>{subtotal} ETB</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700">
+                    <span>VAT (3%):</span>
+                    <span>{vat.toFixed(2)} ETB</span>
+                  </div>
+                  <div className="flex justify-between text-gray-800 font-bold pt-2 border-t">
+                    <span>Total:</span>
+                    <span className="text-xl text-[#c2185b]">{totalWithVAT.toFixed(2)} ETB</span>
+                  </div>
                 </div>
               </div>
 
@@ -153,7 +186,7 @@ function ProductDetail() {
                 className="w-full bg-[#c2185b] text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <ShoppingBag size={20} />
-                {purchasing ? 'Processing...' : 'Buy Now'}
+                {purchasing ? 'Processing...' : 'Buy Now (3% VAT applies)'}
               </button>
             </div>
           </div>

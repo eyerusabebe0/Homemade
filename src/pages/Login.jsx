@@ -1,3 +1,4 @@
+// src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -19,9 +20,8 @@ function Login() {
     setSuccess('');
     setLoading(true);
 
-    // validation
     if (!email || !password) {
-      setError("Please fill all fields");
+      setError("❌ Please fill all fields");
       setLoading(false);
       return;
     }
@@ -29,33 +29,33 @@ function Login() {
     const result = await login(email, password);
 
     if (result.success) {
-      setSuccess("Login successful!");
+      setSuccess("✅ Login successful! Redirecting...");
       setTimeout(() => {
         navigate("/");
       }, 1500);
     } else {
-      setError(result.message || "Login failed");
+      setError(`❌ ${result.message || "Login failed"}`);
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100 py-12 px-4">
-      <div className="bg-white shadow-xl max-w-md w-full p-8" style={{ borderRadius: 0 }}>
+      <div className="bg-white shadow-xl max-w-md w-full p-8 rounded-2xl">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-[#c2185b]">Welcome Back</h2>
           <p className="text-gray-600 mt-2">Login to your account</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-500 text-red-700 px-4 py-3 mb-4" style={{ borderRadius: 0 }}>
-            <span className="font-bold">Error!</span> {error}
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-4 rounded">
+            {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-green-100 border border-green-500 text-green-700 px-4 py-3 mb-4" style={{ borderRadius: 0 }}>
-            <span className="font-bold">Success!</span> {success}
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 mb-4 rounded">
+            {success}
           </div>
         )}
 
@@ -68,8 +68,7 @@ function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border !text-black border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ borderRadius: 0 }}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
                 placeholder="Enter your email"
                 required
               />
@@ -84,8 +83,7 @@ function Login() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full !text-black  pl-10 pr-10 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
-                style={{ borderRadius: 0 }}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c2185b]"
                 placeholder="Enter your password"
                 required
               />
@@ -102,8 +100,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#c2185b] text-white py-3 font-semibold hover:bg-pink-700 transition disabled:opacity-50"
-            style={{ borderRadius: 0 }}
+            className="w-full bg-[#c2185b] text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>

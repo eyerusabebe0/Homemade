@@ -1,3 +1,4 @@
+// src/components/AddProduct.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -13,6 +14,7 @@ function AddProduct() {
     category: 'baby'
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -22,23 +24,31 @@ function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     if (!formData.title || !formData.price || !formData.description || !formData.image) {
-      setError('Please fill in all fields');
+      setError('❌ Please fill in all fields');
       setLoading(false);
       return;
     }
 
     try {
-      await api.post('/products', {
+      const response = await api.post('/products', {
         ...formData,
         price: Number(formData.price)
       });
-      alert('Product submitted for admin approval!');
-      navigate('/dashboard');
+      
+      // Calculate 1% commission
+      const commission = Number(formData.price) * 0.01;
+      
+      setSuccess(`✅ Product submitted for approval! Commission to pay: ${commission} ETB (1% of ${formData.price} ETB). Admin will review and you can pay after approval.`);
+      
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 3000);
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to add product');
+      setError(`❌ ${error.response?.data?.message || 'Failed to add product'}`);
     } finally {
       setLoading(false);
     }
@@ -50,14 +60,19 @@ function AddProduct() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-pink-500 to-[#c2185b] px-6 py-4">
             <h2 className="text-2xl font-bold text-white">Add New Product</h2>
-            <p className="text-pink-100">List your product for sale</p>
+            <p className="text-pink-100">List your product for sale (1% commission applies)</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6">
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-center gap-2">
-                <AlertCircle size={18} />
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg mb-4">
+                {success}
               </div>
             )}
 
@@ -91,6 +106,7 @@ function AddProduct() {
                   required
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-1">1% commission will be applied to this product</p>
             </div>
 
             <div className="mb-4">
@@ -145,7 +161,7 @@ function AddProduct() {
               disabled={loading}
               className="w-full bg-[#c2185b] text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition disabled:opacity-50"
             >
-              {loading ? 'Submitting...' : 'Submit for Approval'}
+              {loading ? 'Submitting...' : 'Submit for Approval (1% Commission)'}
             </button>
           </form>
         </div>
